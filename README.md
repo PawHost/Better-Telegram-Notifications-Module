@@ -65,6 +65,8 @@ The first line is bold and **Open** links to the ticket. Only the **ticket numbe
    - Pick the **triggers** and, if you want, the **mailboxes**
    - Click **Test** to check that it works
 
+   Coming from the original FreeScout **Telegram Notifications** module? Click **Import from Telegram module**. It copies the bot token (if none is set yet), the selected events and the mailbox → chat mapping, one group assignment per chat. Then deactivate the old module so messages aren't sent twice.
+
 > FreeScout's cron (`php artisan schedule:run`) must be running, because messages go out through the queue. Any FreeScout install that sends email already has it.
 
 ---

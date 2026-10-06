@@ -57,5 +57,11 @@
     "A support ticket has been closed.": "Ein Support-Ticket wurde geschlossen.",
     "The ticket status has been changed to :status.": "Der Ticketstatus wurde auf :status geändert.",
     "The ticket has been assigned to :name.": "Das Ticket wurde :name zugewiesen.",
-    "The ticket has been unassigned.": "Die Zuweisung des Tickets wurde aufgehoben."
+    "The ticket has been unassigned.": "Die Zuweisung des Tickets wurde aufgehoben.",
+    "Import from Telegram module": "Aus Telegram-Modul importieren",
+    "Takes over the bot token (if none is set yet), the selected events and the mailbox → chat mapping of the original FreeScout Telegram module. Each chat becomes a group assignment. Afterwards deactivate the old module, otherwise messages are sent twice.": "Übernimmt Bot-Token (falls noch keiner gesetzt ist), die gewählten Events und die Zuordnung Postfach → Chat aus dem originalen FreeScout-Telegram-Modul. Jeder Chat wird zu einer Gruppen-Zuweisung. Danach das alte Modul deaktivieren, sonst kommen Nachrichten doppelt.",
+    "Imported from the Telegram module: :token, :count assignment(s).": "Aus dem Telegram-Modul importiert: :token, :count Zuweisung(en).",
+    "bot token": "Bot-Token",
+    "no bot token": "kein Bot-Token",
+    "No settings of the Telegram module found.": "Keine Einstellungen des Telegram-Moduls gefunden."
 }

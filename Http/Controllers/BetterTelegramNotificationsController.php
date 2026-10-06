@@ -97,6 +97,23 @@ class BetterTelegramNotificationsController extends Controller
         return $this->back()->with('flash_success_floating', __('Test message sent to :name.', ['name' => Notifier::recipientName($recipient)]));
     }
 
+    /**
+     * Import bot token and mailbox -> chat mapping from the original
+     * FreeScout "Telegram Notifications" module (alias "telegram").
+     */
+    public function import()
+    {
+        $result = Notifier::importFromOriginalModule();
+        if ($result['error']) {
+            return $this->back()->with('flash_error_floating', $result['error']);
+        }
+
+        return $this->back()->with('flash_success_floating', __('Imported from the Telegram module: :token, :count assignment(s).', [
+            'token' => $result['token'] ? __('bot token') : __('no bot token'),
+            'count' => $result['count'],
+        ]));
+    }
+
     protected function back()
     {
         return redirect()->route('settings', ['section' => 'bettertelegram']);

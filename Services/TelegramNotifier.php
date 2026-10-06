@@ -56,6 +56,119 @@ class TelegramNotifier
         }
     }
 
+    /**
+     * Event codes of the original Telegram module -> our triggers.
+     */
+    const ORIGINAL_EVENTS = [
+        'conversation.created'          => [self::TRIGGER_NEW_TICKET],
+        'conversation.assigned'         => [self::TRIGGER_ASSIGNED],
+        'conversation.note_added'       => [self::TRIGGER_NOTE],
+        'conversation.customer_replied' => [self::TRIGGER_CUSTOMER_REPLY],
+        'conversation.user_replied'     => [self::TRIGGER_STAFF_REPLY],
+        'conversation.status_changed'   => [self::TRIGGER_CLOSED, self::TRIGGER_STATUS],
+    ];
+
+    /**
+     * Bot token of the original Telegram module. It keeps the token (encrypted)
+     * in .env as TELEGRAM_BOT_TOKEN, exposed as config telegram.bots.main.token
+     * only while that module is active.
+     */
+    public static function getOriginalBotToken()
+    {
+        $token = config('telegram.bots.main.token') ?: env('TELEGRAM_BOT_TOKEN');
+
+        if (!$token) {
+            $env_file = base_path('.env');
+            if (is_readable($env_file)
+                && preg_match('/^\s*TELEGRAM_BOT_TOKEN\s*=\s*(.*?)\s*$/m', file_get_contents($env_file), $m)
+            ) {
+                $token = trim($m[1], '"\'');
+            }
+        }
+
+        return $token ? (string) \Helper::decryptSoft($token) : '';
+    }
+
+    /**
+     * Copy the bot token (unless one is set already) and the mailbox -> chat
+     * mapping of the original module. Each chat becomes one group assignment
+     * covering all mailboxes mapped to it. Existing assignments with the same
+     * chat ID are extended, not replaced. Safe to run more than once.
+     *
+     * @return array ['error' => string|null, 'token' => bool, 'count' => int]
+     */
+    public static function importFromOriginalModule()
+    {
+        $result = ['error' => null, 'token' => false, 'count' => 0];
+
+        $old_token = self::getOriginalBotToken();
+        $mapping = \Option::get('telegram.channels_mapping', []);
+        $mapping = is_array($mapping) ? array_filter($mapping, function ($chat_id) {
+            return trim((string) $chat_id) !== '';
+        }) : [];
+
+        if ($old_token === '' && !$mapping) {
+            $result['error'] = __('No settings of the Telegram module found.');
+
+            return $result;
+        }
+
+        if ($old_token !== '' && self::getBotToken() === '') {
+            \Option::set(self::OPTION_BOT_TOKEN, encrypt($old_token));
+            $result['token'] = true;
+        }
+
+        $triggers = [];
+        foreach ((array) \Option::get('telegram.events', []) as $event) {
+            $triggers = array_merge($triggers, self::ORIGINAL_EVENTS[$event] ?? []);
+        }
+        if (!$triggers) {
+            $triggers = array_keys(self::triggers());
+        }
+        $triggers = array_values(array_unique($triggers));
+
+        // chat ID => mailbox IDs
+        $chats = [];
+        foreach ($mapping as $mailbox_id => $chat_id) {
+            $chats[trim((string) $chat_id)][] = (int) $mailbox_id;
+        }
+
+        $titles = \Option::get('telegram_channels', []);
+        $recipients = self::getRecipients();
+
+        foreach ($chats as $chat_id => $mailboxes) {
+            $found = false;
+            foreach ($recipients as $i => $existing) {
+                if ($existing['type'] == self::TYPE_GROUP && (string) $existing['chat_id'] === (string) $chat_id) {
+                    $recipients[$i]['triggers'] = array_values(array_unique(array_merge($existing['triggers'] ?? [], $triggers)));
+                    // Empty = all mailboxes already.
+                    if (!empty($existing['mailboxes'])) {
+                        $recipients[$i]['mailboxes'] = array_values(array_unique(array_merge($existing['mailboxes'], $mailboxes)));
+                    }
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $recipients[] = [
+                    'id'        => bin2hex(random_bytes(8)),
+                    'type'      => self::TYPE_GROUP,
+                    'user_id'   => 0,
+                    'name'      => (string) ($titles[$chat_id] ?? 'Telegram '.$chat_id),
+                    'chat_id'   => (string) $chat_id,
+                    'triggers'  => $triggers,
+                    'mailboxes' => $mailboxes,
+                    'skip_own'  => false,
+                ];
+            }
+            $result['count']++;
+        }
+
+        self::saveRecipients($recipients);
+
+        return $result;
+    }
+
     public static function getRecipients()
     {
         $recipients = \Option::get(self::OPTION_RECIPIENTS, []);

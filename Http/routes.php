@@ -4,4 +4,5 @@ Route::group(['middleware' => 'web', 'prefix' => \Helper::getSubdirectory(), 'na
     Route::post('/modules/bettertelegram/recipients', ['uses' => 'BetterTelegramNotificationsController@saveRecipient', 'middleware' => ['auth', 'roles'], 'roles' => ['admin']])->name('bettertelegram.recipient.save');
     Route::post('/modules/bettertelegram/recipients/delete', ['uses' => 'BetterTelegramNotificationsController@deleteRecipient', 'middleware' => ['auth', 'roles'], 'roles' => ['admin']])->name('bettertelegram.recipient.delete');
     Route::post('/modules/bettertelegram/test', ['uses' => 'BetterTelegramNotificationsController@test', 'middleware' => ['auth', 'roles'], 'roles' => ['admin']])->name('bettertelegram.test');
+    Route::post('/modules/bettertelegram/import', ['uses' => 'BetterTelegramNotificationsController@import', 'middleware' => ['auth', 'roles'], 'roles' => ['admin']])->name('bettertelegram.import');
 });

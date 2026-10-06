@@ -26,6 +26,16 @@
     </div>
 </form>
 
+<form class="form-horizontal margin-bottom" method="POST" action="{{ route('bettertelegram.import') }}">
+    {{ csrf_field() }}
+    <div class="form-group">
+        <div class="col-sm-6 col-sm-offset-2">
+            <button type="submit" class="btn btn-default">{{ __('Import from Telegram module') }}</button>
+            <p class="block-help">{{ __('Takes over the bot token (if none is set yet), the selected events and the mailbox → chat mapping of the original FreeScout Telegram module. Each chat becomes a group assignment. Afterwards deactivate the old module, otherwise messages are sent twice.') }}</p>
+        </div>
+    </div>
+</form>
+
 <h3 class="subheader">{{ __('User & Group Assignments') }}</h3>
 
 <form class="form-horizontal margin-bottom" method="POST" action="{{ route('bettertelegram.recipient.save') }}" id="btn-assign-form">
@@ -77,7 +87,7 @@
     <div class="form-group">
         <label for="btn_mailboxes" class="col-sm-2 control-label">{{ __('Mailboxes') }}</label>
         <div class="col-sm-6">
-            <select id="btn_mailboxes" name="mailboxes[]" class="form-control input-sized-lg" multiple size="{{ min(max($mailboxes->count(), 2), 8) }}">
+            <select id="btn_mailboxes" name="mailboxes[]" class="form-control input-sized-lg" multiple size="{{ min(max($mailboxes->count(), 2), 8) }}" style="height:auto;min-height:120px;resize:vertical;overflow:auto">
                 @foreach ($mailboxes as $mailbox)
                     <option value="{{ $mailbox->id }}" @if (in_array($mailbox->id, old('mailboxes', []))) selected @endif>{{ $mailbox->name }}</option>
                 @endforeach
