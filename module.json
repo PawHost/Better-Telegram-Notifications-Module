@@ -1,0 +1,22 @@
+{
+    "name": "BetterTelegramNotifications",
+    "alias": "bettertelegram",
+    "description": "Sends a Telegram message when a ticket is created or updated. Per-user and per-group chat IDs, filtered by trigger and mailbox. Only ticket number, subject and link are sent — no customer data.",
+    "version": "1.0.0",
+    "detailsUrl": "",
+    "author": "PawHost",
+    "authorUrl": "https://pawhost.de",
+    "requiredAppVersion": "1.8.0",
+    "license": "GPL-3.0",
+    "keywords": ["telegram", "notifications"],
+    "active": 0,
+    "order": 0,
+    "providers": [
+        "Modules\\BetterTelegramNotifications\\Providers\\BetterTelegramNotificationsServiceProvider"
+    ],
+    "aliases": {},
+    "files": [
+        "start.php"
+    ],
+    "requires": []
+}

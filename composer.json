@@ -1,0 +1,16 @@
+{
+    "name": "pawhost/bettertelegramnotifications",
+    "description": "Telegram notifications for FreeScout tickets.",
+    "type": "freescout-module",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "PawHost"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Modules\\BetterTelegramNotifications\\": ""
+        }
+    }
+}
